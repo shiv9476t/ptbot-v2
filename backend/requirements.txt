@@ -424,6 +424,7 @@ stack_data @ file:///opt/miniconda3/conda-bld/stack_data_1757067040463/work
 starlette==0.52.1
 statsmodels @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_e5zr93m722/croot/statsmodels_1753363819610/work
 streamlit @ file:///opt/miniconda3/conda-bld/streamlit-split_1761826255444/work/streamlit
+stripe==15.0.1
 superqt @ file:///opt/miniconda3/conda-bld/superqt_1758274737768/work
 sympy @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_9b15dnv4zk/croot/sympy_1756713487054/work
 tables @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_ddus262lcs/croot/pytables_1748447944347/work
