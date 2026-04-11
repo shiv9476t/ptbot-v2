@@ -20,6 +20,7 @@ class PT(db.Model):
     subscription_status = db.Column(db.String)
     plan = db.Column(db.String)
     trial_ends_at = db.Column(db.DateTime)
+    price_mode = db.Column(db.String, nullable=False, default="deflect")
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     contacts = db.relationship("Contact", back_populates="pt", lazy="dynamic")
