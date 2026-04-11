@@ -43,10 +43,7 @@ class ProductionConfig(Config):
         "INSTAGRAM_VERIFY_TOKEN",
         "ADMIN_SECRET",
         "STRIPE_SECRET_KEY",
-        "STRIPE_WEBHOOK_SECRET",
         "CLERK_SECRET_KEY",
-        "RESEND_API_KEY",
-        "SENTRY_DSN",
         "SECRET_KEY",
     ]
 
