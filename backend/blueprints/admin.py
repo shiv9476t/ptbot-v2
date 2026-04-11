@@ -58,7 +58,7 @@ def update_pt(pt_id: int):
         "name", "email", "tone_config", "calendly_link",
         "instagram_account_id", "instagram_token", "slug",
         "onboarding_complete", "subscription_status", "plan",
-        "stripe_customer_id", "trial_ends_at",
+        "stripe_customer_id", "trial_ends_at", "price_mode",
     }
     for field in updatable:
         if field in body:
@@ -182,6 +182,7 @@ def _pt_to_dict(pt: PT) -> dict:
         "plan": pt.plan,
         "stripe_customer_id": pt.stripe_customer_id,
         "calendly_link": pt.calendly_link,
+        "price_mode": pt.price_mode,
         "trial_ends_at": pt.trial_ends_at.isoformat() if pt.trial_ends_at else None,
         "created_at": pt.created_at.isoformat(),
     }
