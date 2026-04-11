@@ -69,6 +69,7 @@ cffi @ file:///opt/miniconda3/conda-bld/cffi_1761832773185/work
 chardet @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_84vw02jazy/croot/chardet_1755516287623/work
 charset-normalizer @ file:///opt/miniconda3/conda-bld/charset-normalizer_1761744840553/work
 chromadb==1.5.5
+clerk-backend-api==5.0.6
 click @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_2bwamfk1ra/croot/click_1754477943404/work
 cloudpickle @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_04keaza5jy/croot/cloudpickle_1751309451361/work
 colorcet @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/colorcet_1728594017635/work
