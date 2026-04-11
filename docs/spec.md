@@ -55,11 +55,12 @@ ptbot/
 │   │   ├── admin.py            # Internal tooling
 │   │   └── demo.py             # Public demo pages
 │   ├── services/
-│   │   ├── agent.py            # AI agent logic
-│   │   ├── knowledge.py        # ChromaDB operations
-│   │   ├── onboarding.py       # embed_kb(), add_pt(), add_demo_pt()
+│   │   ├── agent.py            # AI agent logic — contact lifecycle, Claude API, photo tool
+│   │   ├── knowledge.py        # ChromaDB operations — embed_kb(), query_kb(), delete_kb()
+│   │   ├── onboarding.py       # add_pt(), add_demo_pt(), embed_pt_kb()
+│   │   ├── prompt.py           # build_system_prompt() — full conversation strategy prompt
 │   │   └── channels/
-│   │       └── instagram.py    # Meta API calls
+│   │       └── instagram.py    # Meta API calls — verify_signature, parse_message, send_reply, send_image
 │   ├── models/                 # SQLAlchemy models
 │   ├── database/               # Alembic migrations
 │   ├── scripts/                # Thin CLI wrappers for onboarding
@@ -104,6 +105,7 @@ PostgreSQL. Every table holding PT-specific data has a `pt_id` foreign key. Ever
 | slug | string unique | Demo URL identifier |
 | tone_config | text | Voice and personality config for the bot |
 | calendly_link | string | Where qualified leads are sent |
+| price_mode | string | `deflect` (default) or `reveal` — controls how the bot handles pricing questions |
 | onboarding_complete | boolean | Gates self-serve features |
 | stripe_customer_id | string | Links to Stripe |
 | subscription_status | string | trialing / active / past_due / cancelled |
@@ -147,6 +149,8 @@ Six blueprints. Each has a single caller and a distinct verification method.
 | POST | /stripe | All subscription events — update pt subscription_status |
 
 ### auth.py — OAuth
+**Currently an empty stub — the Instagram OAuth flow is Phase 5.**
+
 | Method | Endpoint | Purpose |
 |---|---|---|
 | GET | /auth/callback | Receives Meta OAuth code, exchanges for token, saves to PT record |
@@ -180,8 +184,8 @@ No auth required. Each PT has a unique slug.
 
 | Method | Endpoint | Purpose |
 |---|---|---|
-| GET | /demo/:slug | Serve the demo chat UI |
-| POST | /demo/:slug/chat | Handle messages from the demo page |
+| GET | /demo/:slug | Serve the demo chat UI — **deferred to Phase 3 (frontend)** |
+| POST | /demo/:slug/chat | Handle messages from the demo page ✓ |
 
 ---
 
@@ -233,6 +237,7 @@ Integration tests for the three critical paths that cannot break silently. Run a
 | CLERK_SECRET_KEY | Backend | Clerk JWT verification |
 | RESEND_API_KEY | Backend | Transactional email |
 | SENTRY_DSN | Both | Error reporting |
+| STATIC_BASE_URL | Backend | Base URL for publicly accessible transformation photo URLs (e.g. https://api.ptbot.co) |
 | VITE_CLERK_PUBLISHABLE_KEY | Frontend | Clerk React components |
 | VITE_API_URL | Frontend | Backend API base URL |
 | VITE_POSTHOG_KEY | Frontend | PostHog analytics |
@@ -241,16 +246,20 @@ Integration tests for the three critical paths that cannot break silently. Run a
 
 ## 10. Build Sequence
 
-### Phase 1 — Foundation
+### Phase 1 — Foundation ✓
 - Monorepo setup, Railway environments, GitHub Actions CI
 - PostgreSQL on Railway, SQLAlchemy models, first Alembic migration
 - Flask restructured into blueprints and services layer
 - Sentry and structured logging wired in
+- Gunicorn + Procfile, Railway deployment config
 
-### Phase 2 — Auth
-- Clerk integration — signup, login, JWT verification middleware
-- Dashboard API endpoints with PT-scoped queries
-- Admin endpoints ported from existing code
+### Phase 2 — Auth and Services ✓
+- Clerk JWT verification middleware on dashboard blueprint
+- Full services layer: agent, knowledge, prompt, onboarding, channels/instagram
+- All six blueprints implemented
+- Instagram webhook (verify + DM handling), Stripe webhook (subscription events)
+- Demo chat endpoint (POST /demo/<slug>/chat)
+- Admin endpoints: list PTs/contacts, update PT, test agent, add demo PT, embed KB
 
 ### Phase 3 — Frontend
 - React + Vite + Tailwind + shadcn setup

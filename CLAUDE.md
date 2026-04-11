@@ -18,11 +18,12 @@ ptbot/
 │   │   ├── admin.py            # Internal tooling
 │   │   └── demo.py             # Public demo pages
 │   ├── services/
-│   │   ├── agent.py            # AI agent logic
-│   │   ├── knowledge.py        # ChromaDB operations
-│   │   ├── onboarding.py       # embed_kb(), add_pt(), add_demo_pt()
+│   │   ├── agent.py            # AI agent logic — contact lifecycle, Claude API, photo tool
+│   │   ├── knowledge.py        # ChromaDB operations — embed_kb(), query_kb(), delete_kb()
+│   │   ├── onboarding.py       # add_pt(), add_demo_pt(), embed_pt_kb()
+│   │   ├── prompt.py           # build_system_prompt() — full conversation strategy prompt
 │   │   └── channels/
-│   │       └── instagram.py    # Meta API calls
+│   │       └── instagram.py    # Meta API calls — verify_signature, parse_message, send_reply, send_image
 │   ├── models/                 # SQLAlchemy models
 │   ├── database/               # Alembic migrations
 │   ├── scripts/                # Thin CLI wrappers
@@ -70,9 +71,27 @@ ptbot/
 - When creating a new file, follow the folder structure above exactly.
 - Never modify the database schema directly — always create an Alembic migration.
 
+## Blueprint Status
+- `instagram.py` — GET /instagram (webhook verify) + POST /instagram (incoming DMs) ✓
+- `stripe.py` — POST /stripe (subscription events) ✓
+- `auth.py` — **currently empty stub**. The OAuth callback for connecting Instagram is Phase 5.
+- `dashboard.py` — all five dashboard routes with Clerk JWT auth ✓
+- `admin.py` — all admin routes + GET /health ✓
+- `demo.py` — POST /demo/<slug>/chat ✓. GET /demo/<slug> (serve frontend) is deferred to Phase 3.
+
 ## Current Build Phase
-**Phase 1 — Foundation**
+**Phases 1 and 2 are complete.**
+
+Phase 1 — Foundation ✓
 - Flask app factory and blueprint structure
 - SQLAlchemy models and first Alembic migration
 - Config and extensions setup
 - Sentry and structured logging
+
+Phase 2 — Auth and Services ✓
+- Clerk JWT verification on dashboard blueprint
+- Full services layer: agent, knowledge, prompt, onboarding, channels/instagram
+- All six blueprints implemented (auth.py stub pending Phase 5)
+- Gunicorn + Procfile, Railway deployment config
+
+**Next: Phase 3 — Frontend**
