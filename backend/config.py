@@ -39,7 +39,6 @@ class ProductionConfig(Config):
     REQUIRED_VARS = [
         "DATABASE_URL",
         "ANTHROPIC_API_KEY",
-        "META_APP_ID",
         "META_INSTAGRAM_APP_SECRET",
         "INSTAGRAM_VERIFY_TOKEN",
         "ADMIN_SECRET",
