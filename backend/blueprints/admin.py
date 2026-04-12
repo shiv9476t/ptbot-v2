@@ -67,6 +67,24 @@ def update_pt(pt_id: int):
     db.session.commit()
     return jsonify(_pt_to_dict(pt)), 200
 
+@admin_bp.post("/pts")
+def create_pt():
+    body = request.get_json(silent=True) or {}
+    required = {"name", "email", "clerk_user_id"}
+    missing = required - body.keys()
+    if missing:
+        return jsonify({"error": f"Missing fields: {', '.join(sorted(missing))}"}), 400
+
+    pt = PT(
+        name=body["name"],
+        email=body["email"],
+        clerk_user_id=body["clerk_user_id"],
+        slug=body.get("slug", body["email"].split("@")[0]),
+    )
+    db.session.add(pt)
+    db.session.commit()
+    return jsonify(_pt_to_dict(pt)), 201
+
 
 # ---------------------------------------------------------------------------
 # Contact routes
