@@ -23,6 +23,9 @@ _clerk = Clerk(bearer_auth=os.environ.get("CLERK_SECRET_KEY", ""))
 
 @dashboard_bp.before_request
 def require_pt():
+    if request.method == 'OPTIONS':
+        return
+
     state = _clerk.authenticate_request(
         request,
         AuthenticateRequestOptions(secret_key=os.environ.get("CLERK_SECRET_KEY", "")),
