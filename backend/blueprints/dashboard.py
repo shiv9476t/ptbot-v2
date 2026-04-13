@@ -3,12 +3,13 @@ import os
 
 from clerk_backend_api import Clerk
 from clerk_backend_api.security.types import AuthenticateRequestOptions
-from flask import Blueprint, g, jsonify, request
+from flask import Blueprint, current_app, g, jsonify, request
 
 from extensions import db
 from models.contact import Contact
 from models.message import Message
 from models.pt import PT
+from services.billing import create_checkout_session, create_portal_session, get_subscription_status
 
 logger = logging.getLogger(__name__)
 
@@ -107,6 +108,31 @@ def update_settings():
 
     db.session.commit()
     return jsonify(_settings_to_dict(pt)), 200
+
+
+# ---------------------------------------------------------------------------
+# Billing
+# ---------------------------------------------------------------------------
+
+@dashboard_bp.post("/billing/create-checkout-session")
+def billing_create_checkout_session():
+    session = create_checkout_session(
+        g.pt,
+        current_app.config["STRIPE_PRICE_ID"],
+        current_app.config["FRONTEND_URL"],
+    )
+    return jsonify({"url": session.url}), 200
+
+
+@dashboard_bp.post("/billing/create-portal-session")
+def billing_create_portal_session():
+    session = create_portal_session(g.pt, current_app.config["FRONTEND_URL"])
+    return jsonify({"url": session.url}), 200
+
+
+@dashboard_bp.get("/billing/status")
+def billing_status():
+    return jsonify(get_subscription_status(g.pt)), 200
 
 
 # ---------------------------------------------------------------------------
