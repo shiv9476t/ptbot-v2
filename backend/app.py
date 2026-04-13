@@ -9,8 +9,11 @@ def create_app():
     app.config.from_object(get_config())
     _configure_logging(app)
     init_extensions(app)
-    CORS(app, origins=["http://localhost:5173"])
-    _register_blueprints(app)
+    CORS(app, origins=[
+        "http://localhost:5173",
+        "https://successful-enjoyment-staging.up.railway.app"
+    ])
+        _register_blueprints(app)
     return app
 
 
