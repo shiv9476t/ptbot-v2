@@ -13,7 +13,7 @@ def create_app():
         "http://localhost:5173",
         "https://successful-enjoyment-staging.up.railway.app"
     ])
-        _register_blueprints(app)
+    _register_blueprints(app)
     return app
 
 
