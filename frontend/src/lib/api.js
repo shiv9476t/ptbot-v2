@@ -16,3 +16,11 @@ export async function apiFetch(endpoint, token, options = {}) {
 
   return response.json()
 }
+
+export async function createCheckoutSession(token) {
+  return apiFetch('/api/dashboard/billing/create-checkout-session', token, { method: 'POST' })
+}
+
+export async function createPortalSession(token) {
+  return apiFetch('/api/dashboard/billing/create-portal-session', token, { method: 'POST' })
+}

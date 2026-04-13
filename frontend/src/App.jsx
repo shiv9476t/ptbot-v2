@@ -6,6 +6,9 @@ import OverviewPage from './pages/dashboard/OverviewPage'
 import DashboardLayout from './components/shared/DashboardLayout'
 import ConversationsPage from './pages/dashboard/ConversationsPage'
 import SettingsPage from './pages/dashboard/SettingsPage'
+import CheckoutPage from './pages/billing/CheckoutPage'
+import SuccessPage from './pages/billing/SuccessPage'
+import CancelPage from './pages/billing/CancelPage'
 
 function ProtectedRoute({ children }) {
   const { isSignedIn, isLoaded } = useAuth()
@@ -41,6 +44,13 @@ export default function App() {
             <DashboardLayout>
               <SettingsPage />
             </DashboardLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/billing/success" element={<SuccessPage />} />
+        <Route path="/billing/cancel" element={<CancelPage />} />
+        <Route path="/billing/checkout" element={
+          <ProtectedRoute>
+            <CheckoutPage />
           </ProtectedRoute>
         } />
       </Routes>
