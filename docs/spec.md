@@ -22,7 +22,7 @@ PTBot is a SaaS product that automates Instagram DM lead qualification for onlin
 
 | Layer | Choice | Why |
 |---|---|---|
-| Backend | Python / Flask | Existing knowledge, widely used, excellent libraries |
+| Backend | Python / Flask / Flask-CORS | Existing knowledge, widely used, excellent libraries |
 | Database | PostgreSQL | Production-grade, concurrent writes, hosted on Railway |
 | ORM | SQLAlchemy + Alembic | Python-native queries, schema migrations over time |
 | Frontend | React + Vite | Component model suits a dashboard; fast build tooling |
@@ -44,16 +44,18 @@ PTBot is a SaaS product that automates Instagram DM lead qualification for onlin
 ```
 ptbot/
 ├── backend/
-│   ├── app.py                  # App factory — creates and configures the Flask app
+│   ├── app.py                  # App factory — creates and configures the Flask app, CORS
 │   ├── config.py               # All config from environment variables
 │   ├── extensions.py           # DB, Sentry etc. initialised once
+│   ├── run.py                  # Local dev entry point — loads .env, calls create_app()
+│   ├── Procfile                # Gunicorn start command for Railway
 │   ├── blueprints/
 │   │   ├── instagram.py        # Meta webhook
 │   │   ├── stripe.py           # Stripe webhook
-│   │   ├── auth.py             # OAuth callback
-│   │   ├── dashboard.py        # Logged-in PT API
-│   │   ├── admin.py            # Internal tooling
-│   │   └── demo.py             # Public demo pages
+│   │   ├── auth.py             # OAuth callback (stub — Phase 5)
+│   │   ├── dashboard.py        # Logged-in PT API (Clerk JWT auth, OPTIONS bypass for CORS)
+│   │   ├── admin.py            # Internal tooling (Bearer token auth)
+│   │   └── demo.py             # Public demo chat endpoint
 │   ├── services/
 │   │   ├── agent.py            # AI agent logic — contact lifecycle, Claude API, photo tool
 │   │   ├── knowledge.py        # ChromaDB operations — embed_kb(), query_kb(), delete_kb()
@@ -165,6 +167,9 @@ All routes require a valid Clerk JWT. All queries scoped to the authenticated PT
 | GET | /api/dashboard/contacts/:id/messages | Message history for a lead |
 | GET | /api/dashboard/settings | Fetch current PT settings |
 | PUT | /api/dashboard/settings | Update settings (Calendly, tone, pricing) |
+| POST | /api/dashboard/billing/create-checkout-session | Create a Stripe Checkout Session; returns redirect URL |
+| POST | /api/dashboard/billing/create-portal-session | Create a Stripe Customer Portal Session; returns redirect URL |
+| GET | /api/dashboard/billing/status | Return subscription_status, plan, and trial_ends_at for the PT |
 
 ### admin.py — Internal tooling
 All routes require `Authorization: Bearer <ADMIN_SECRET>` header.
@@ -174,9 +179,10 @@ All routes require `Authorization: Bearer <ADMIN_SECRET>` header.
 | GET | /admin/pts | List all PT records |
 | GET | /admin/contacts | List all leads across all PTs |
 | GET | /admin/contacts/:id/messages | Message history for any lead |
+| POST | /admin/pts | Create a new PT record |
 | POST | /admin/pts/:id | Update a PT record |
 | POST | /admin/message | Send a test message as a PT (agent testing) |
-| POST | /admin/demo/add | Add a demo PT |
+| POST | /admin/demo/add | Add a demo PT (creates record + embeds KB) |
 | POST | /admin/knowledge/:pt_id | Embed knowledge base for a PT |
 
 ### demo.py — Public demo
@@ -268,10 +274,19 @@ Integration tests for the three critical paths that cannot break silently. Run a
 - Clerk React components for auth flow
 
 ### Phase 4 — Billing
+**Completed:**
 - Stripe Checkout for subscription signup
-- Stripe webhook handler — update subscription_status on events
-- Customer Portal redirect for self-managed subscriptions
-- Subscription status middleware — block API if not active
+- Stripe webhook handler updating subscription_status on events
+- Customer Portal route (create-portal-session endpoint built, UI not yet added)
+- Success and cancel pages with polling logic
+- SPA routing fix (Caddy serving dist with try_files fallback)
+- Billing service layer (services/billing.py)
+- Three billing routes added to dashboard blueprint
+
+**Still to do:**
+- Subscription status middleware — redirect to /billing/checkout if subscription not active
+- Customer Portal link in dashboard Settings page
+- Clerk post-signup redirect to /billing/checkout (currently broken)
 
 ### Phase 5 — Self-serve onboarding (initially gated)
 - Instagram OAuth flow accessible from dashboard
