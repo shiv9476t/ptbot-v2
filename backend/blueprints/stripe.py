@@ -61,14 +61,14 @@ def webhook():
 
 def _handle_subscription_change(subscription: dict) -> None:
     """Update subscription_status and plan from a subscription object."""
-    customer_id = subscription.get("customer")
-    stripe_status = subscription.get("status", "")
+    customer_id = subscription.customer
+    stripe_status = subscription.status
     status = _STATUS_MAP.get(stripe_status, "past_due")
 
     plan = None
-    items = subscription.get("items", {}).get("data", [])
+    items = subscription.items.data
     if items:
-        plan = items[0].get("price", {}).get("lookup_key")
+        plan = items[0].price.lookup_key
 
     pt = PT.query.filter_by(stripe_customer_id=customer_id).first()
     if pt is None:
@@ -87,7 +87,7 @@ def _handle_subscription_change(subscription: dict) -> None:
 
 def _handle_subscription_deleted(subscription: dict) -> None:
     """Mark subscription as cancelled when Stripe deletes it."""
-    customer_id = subscription.get("customer")
+    customer_id = subscription.customer
 
     pt = PT.query.filter_by(stripe_customer_id=customer_id).first()
     if pt is None:
@@ -101,7 +101,7 @@ def _handle_subscription_deleted(subscription: dict) -> None:
 
 def _handle_payment_failed(invoice: dict) -> None:
     """Mark subscription as past_due when a payment fails."""
-    customer_id = invoice.get("customer")
+    customer_id = invoice.customer
 
     pt = PT.query.filter_by(stripe_customer_id=customer_id).first()
     if pt is None:
