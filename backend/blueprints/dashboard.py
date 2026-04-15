@@ -43,6 +43,9 @@ def require_pt():
 
     g.pt = pt
 
+    if pt.subscription_status not in ("active", "trialing") and "/billing/" not in request.path:
+        return jsonify({"error": "subscription_required"}), 403
+
 
 # ---------------------------------------------------------------------------
 # Routes

@@ -11,6 +11,13 @@ export async function apiFetch(endpoint, token, options = {}) {
   })
 
   if (!response.ok) {
+    if (response.status === 403) {
+      const body = await response.json()
+      if (body.error === 'subscription_required') {
+        window.location.href = '/billing/checkout'
+        return
+      }
+    }
     throw new Error(`API error: ${response.status}`)
   }
 
