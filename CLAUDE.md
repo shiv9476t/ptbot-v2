@@ -7,9 +7,11 @@ PTBot is a SaaS product that automates Instagram DM lead qualification for onlin
 ```
 ptbot/
 ├── backend/
-│   ├── app.py                  # App factory
+│   ├── app.py                  # App factory — CORS configured for frontend origins
 │   ├── config.py               # All config from env vars
 │   ├── extensions.py           # DB, Sentry — initialised once
+│   ├── run.py                  # Local dev entry point — loads .env then calls create_app()
+│   ├── Procfile                # Gunicorn start command for Railway
 │   ├── blueprints/
 │   │   ├── instagram.py        # Meta webhook
 │   │   ├── stripe.py           # Stripe webhook
@@ -44,7 +46,7 @@ ptbot/
 ```
 
 ## Tech Stack
-- **Backend**: Python, Flask, SQLAlchemy, Alembic
+- **Backend**: Python, Flask, Flask-CORS, SQLAlchemy, Alembic
 - **Database**: PostgreSQL (Railway), ChromaDB (vector store)
 - **Frontend**: React, Vite, Tailwind CSS, shadcn
 - **Auth**: Clerk
@@ -75,8 +77,8 @@ ptbot/
 - `instagram.py` — GET /instagram (webhook verify) + POST /instagram (incoming DMs) ✓
 - `stripe.py` — POST /stripe (subscription events) ✓
 - `auth.py` — **currently empty stub**. The OAuth callback for connecting Instagram is Phase 5.
-- `dashboard.py` — all five dashboard routes with Clerk JWT auth ✓
-- `admin.py` — all admin routes + GET /health ✓
+- `dashboard.py` — all five dashboard routes with Clerk JWT auth ✓. OPTIONS requests bypass auth for CORS preflight.
+- `admin.py` — all admin routes + GET /health ✓. Includes POST /admin/pts (create) and POST /admin/pts/<id> (update).
 - `demo.py` — POST /demo/<slug>/chat ✓. GET /demo/<slug> (serve frontend) is deferred to Phase 3.
 
 ## Current Build Phase
