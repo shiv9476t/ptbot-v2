@@ -28,6 +28,7 @@ def _configure_logging(app):
 def _register_blueprints(app):
     from blueprints.admin import admin_bp, health_bp
     from blueprints.auth import auth_bp
+    from blueprints.clerk import clerk_bp
     from blueprints.dashboard import dashboard_bp
     from blueprints.demo import demo_bp
     from blueprints.instagram import instagram_bp
@@ -35,6 +36,7 @@ def _register_blueprints(app):
 
     app.register_blueprint(instagram_bp)
     app.register_blueprint(stripe_bp)
+    app.register_blueprint(clerk_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(health_bp)

@@ -26,6 +26,7 @@ class Config:
 
     # Clerk
     CLERK_SECRET_KEY = os.environ.get("CLERK_SECRET_KEY", "")
+    CLERK_WEBHOOK_SECRET = os.environ.get("CLERK_WEBHOOK_SECRET", "")
 
     # Resend
     RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
