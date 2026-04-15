@@ -4,7 +4,7 @@ import Navbar from '../../components/shared/Navbar'
 
 const CONVERSATION = [
   { role: 'lead', text: 'Hi, could you help me lose fat?' },
-  { role: 'bot', text: "Hey! Absolutely, that's exactly what Tom specialises in. What's the main thing that's been frustrating you about fat loss lately?" },
+  { role: 'bot', text: "Hey! Absolutely, that's exactly what Alex specialises in. What's the main thing that's been frustrating you about fat loss lately?" },
   { role: 'lead', text: "I've been eating clean and exercising, but the scale isn't going down" },
   { role: 'bot', text: "That's frustrating as hell — doing everything 'right' but not seeing it reflected on the scale. How long have you been at it?" },
   { role: 'lead', text: "Been on and off for around a year now, I get demotivated when I don't see results" },
@@ -14,15 +14,15 @@ const CONVERSATION = [
   { role: 'lead', text: "Honestly, I hear a lot of conflicting information online, so I just try to stick to basic health advice. It's difficult to stick to though when I don't see results" },
   { role: 'bot', text: "Yeah, the internet is a nightmare for fitness advice. That constant start-stop cycle tells me you need a proper system, not just 'eat healthy and exercise.' What's your day-to-day look like — working, studying?" },
   { role: 'lead', text: 'Working full-time in finance, so busy but I manage to get workouts in' },
-  { role: 'bot', text: "Finance — long hours and stress. Makes sense why you need something that actually works without the guesswork. Tom works specifically with busy professionals stuck in that exact cycle. Would you be up for a quick chat with him?" },
+  { role: 'bot', text: "Finance — long hours and stress. Makes sense why you need something that actually works without the guesswork. Alex works specifically with busy professionals stuck in that exact cycle. Would you be up for a quick chat with him?" },
   { role: 'lead', text: "Not sure tbh, I had a coach a couple years ago but didn't enjoy working with him" },
   { role: 'bot', text: "Fair enough — a bad coaching experience will put anyone off. What went wrong — was it the approach, communication, or something else?" },
   { role: 'lead', text: "His approach wasn't flexible to my lifestyle. I wanted to skip breakfast but he didn't allow it" },
-  { role: 'bot', text: "Ah — he was forcing you into his one-size-fits-all system instead of building around how you actually live. That's exactly the opposite of how Tom approaches it. His thing is making the programme fit your life, not the other way around. It's just a casual chat — no pressure, no pitch. Worth hearing how his approach would work around your finance schedule?" },
+  { role: 'bot', text: "Ah — he was forcing you into his one-size-fits-all system instead of building around how you actually live. That's exactly the opposite of how Alex approaches it. His thing is making the programme fit your life, not the other way around. It's just a casual chat — no pressure, no pitch. Worth hearing how his approach would work around your finance schedule?" },
   { role: 'lead', text: "Yeah that makes sense, it's worth a try" },
-  { role: 'bot', text: "Spot on. Here's Tom's booking link: calendly.com/holman-tom. It's just 20-30 minutes and he'll walk through exactly how he'd approach your situation." },
+  { role: 'bot', text: "Spot on. Here's Alex's booking link: calendly.com/alex-carter. It's just 20-30 minutes and he'll walk through exactly how he'd approach your situation." },
   { role: 'lead', text: 'Thank you, just booked in' },
-  { role: 'bot', text: "Perfect — Tom will sort you out. Looking forward to hearing how it goes!" },
+  { role: 'bot', text: "Perfect — Alex will sort you out. Looking forward to hearing how it goes!" },
 ]
 
 function useInView() {
@@ -56,12 +56,43 @@ const serif = { fontFamily: "'DM Serif Display', serif" }
 const sans = { fontFamily: 'system-ui, sans-serif' }
 
 export default function HomePage() {
-  const chatRef = useRef(null)
+  const messagesEndRef = useRef(null)
+  const [visibleCount, setVisibleCount] = useState(0)
+  const [showTyping, setShowTyping] = useState(false)
   const [form, setForm] = useState({ name: '', instagram: '', email: '' })
 
   useEffect(() => {
-    if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight
+    let cancelled = false
+    const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+    async function run() {
+      while (!cancelled) {
+        setVisibleCount(0)
+        setShowTyping(false)
+        for (let i = 0; i < CONVERSATION.length; i++) {
+          if (cancelled) return
+          if (CONVERSATION[i].role === 'bot') {
+            setShowTyping(true)
+            await wait(1800)
+            if (cancelled) return
+            setShowTyping(false)
+          } else {
+            await wait(1200)
+            if (cancelled) return
+          }
+          setVisibleCount(i + 1)
+        }
+        await wait(2500)
+      }
+    }
+
+    run()
+    return () => { cancelled = true }
   }, [])
+
+  useEffect(() => {
+    if (messagesEndRef.current) messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
+  }, [visibleCount, showTyping])
 
   function handleDemoSubmit(e) {
     e.preventDefault()
@@ -71,7 +102,13 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-white text-black">
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap');`}</style>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap');
+        @keyframes typingBounce {
+          0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+          30% { transform: translateY(-4px); opacity: 1; }
+        }
+      `}</style>
 
       <Navbar />
 
@@ -93,33 +130,64 @@ export default function HomePage() {
           </Link>
         </div>
 
-        {/* Instagram DM mockup */}
-        <div className="rounded-2xl overflow-hidden shadow-2xl border border-gray-800" style={{ background: '#000' }}>
-          <div className="px-4 py-3 border-b border-gray-800 flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style={sans}>TH</div>
-            <div>
-              <p style={sans} className="text-white text-sm font-semibold">Tom Holman</p>
-              <p style={sans} className="text-gray-500 text-xs">Active now</p>
+        {/* iPhone frame */}
+        <div className="flex justify-center lg:justify-end">
+          <div style={{
+            width: '300px', height: '580px', background: '#000',
+            borderRadius: '48px', boxShadow: '0 40px 80px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.08)',
+            display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative',
+          }}>
+            {/* Notch */}
+            <div style={{
+              position: 'absolute', top: '12px', left: '50%', transform: 'translateX(-50%)',
+              width: '80px', height: '22px', background: '#000',
+              borderRadius: '12px', zIndex: 10,
+              boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.1)',
+            }} />
+
+            {/* Status bar spacing */}
+            <div style={{ height: '44px', flexShrink: 0 }} />
+
+            {/* IG DM header */}
+            <div style={{ borderBottom: '1px solid #1a1a1a', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+              <div style={{ ...sans, width: '34px', height: '34px', borderRadius: '50%', background: '#6366f1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '12px', fontWeight: 700, flexShrink: 0 }}>AC</div>
+              <div>
+                <p style={{ ...sans, color: '#fff', fontSize: '13px', fontWeight: 600, margin: 0 }}>Alex Carter</p>
+                <p style={{ ...sans, color: '#666', fontSize: '11px', margin: 0 }}>Active now</p>
+              </div>
             </div>
-          </div>
-          <div ref={chatRef} className="h-[480px] overflow-y-auto px-4 py-4 flex flex-col gap-3">
-            {CONVERSATION.map((msg, i) => (
-              <div key={i} className={`flex items-end gap-2 ${msg.role === 'lead' ? 'justify-end' : 'justify-start'}`}>
-                {msg.role === 'bot' && (
-                  <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-white flex-shrink-0" style={{ ...sans, fontSize: '10px', fontWeight: 700 }}>TH</div>
-                )}
-                <div
-                  className="max-w-[75%] px-3 py-2 text-sm leading-relaxed text-white"
-                  style={{
-                    ...sans,
+
+            {/* Messages */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {CONVERSATION.slice(0, visibleCount).map((msg, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'flex-end', gap: '6px', justifyContent: msg.role === 'lead' ? 'flex-end' : 'flex-start' }}>
+                  {msg.role === 'bot' && (
+                    <div style={{ ...sans, width: '22px', height: '22px', borderRadius: '50%', background: '#6366f1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '9px', fontWeight: 700, flexShrink: 0 }}>AC</div>
+                  )}
+                  <div style={{
+                    ...sans, maxWidth: '75%', padding: '8px 12px', fontSize: '12px', lineHeight: '1.5', color: '#fff',
                     background: msg.role === 'lead' ? '#0095f6' : '#262626',
                     borderRadius: msg.role === 'lead' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
-                  }}
-                >
-                  {msg.text}
+                  }}>
+                    {msg.text}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+
+              {/* Typing indicator */}
+              {showTyping && (
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px' }}>
+                  <div style={{ ...sans, width: '22px', height: '22px', borderRadius: '50%', background: '#6366f1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '9px', fontWeight: 700, flexShrink: 0 }}>AC</div>
+                  <div style={{ background: '#262626', borderRadius: '18px 18px 18px 4px', padding: '10px 14px', display: 'flex', gap: '4px', alignItems: 'center' }}>
+                    {[0, 1, 2].map(i => (
+                      <div key={i} style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#888', animation: 'typingBounce 1.2s infinite', animationDelay: `${i * 0.2}s` }} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div ref={messagesEndRef} />
+            </div>
           </div>
         </div>
       </section>
