@@ -56,7 +56,7 @@ const serif = { fontFamily: "'DM Serif Display', serif" }
 const sans = { fontFamily: 'system-ui, sans-serif' }
 
 export default function HomePage() {
-  const messagesEndRef = useRef(null)
+  const messagesContainerRef = useRef(null)
   const [visibleCount, setVisibleCount] = useState(0)
   const [showTyping, setShowTyping] = useState(false)
   const [form, setForm] = useState({ name: '', instagram: '', email: '' })
@@ -91,7 +91,9 @@ export default function HomePage() {
   }, [])
 
   useEffect(() => {
-    if (messagesEndRef.current) messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight
+    }
   }, [visibleCount, showTyping])
 
   function handleDemoSubmit(e) {
@@ -158,7 +160,7 @@ export default function HomePage() {
             </div>
 
             {/* Messages */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div ref={messagesContainerRef} style={{ flex: 1, overflowY: 'auto', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {CONVERSATION.slice(0, visibleCount).map((msg, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'flex-end', gap: '6px', justifyContent: msg.role === 'lead' ? 'flex-end' : 'flex-start' }}>
                   {msg.role === 'bot' && (
@@ -186,7 +188,6 @@ export default function HomePage() {
                 </div>
               )}
 
-              <div ref={messagesEndRef} />
             </div>
           </div>
         </div>
