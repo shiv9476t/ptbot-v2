@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '@clerk/clerk-react'
-import { apiFetch } from '../../lib/api'
+import { apiFetch, createPortalSession } from '../../lib/api'
 
 export default function SettingsPage() {
   const { getToken } = useAuth()
@@ -31,6 +31,12 @@ export default function SettingsPage() {
     setSaving(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
+  }
+
+  async function handleManageSubscription() {
+    const token = await getToken()
+    const data = await createPortalSession(token)
+    window.location.href = data.url
   }
 
   if (!settings) return <p className="text-gray-400">Loading...</p>
@@ -80,6 +86,13 @@ export default function SettingsPage() {
           className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-medium px-6 py-2 rounded-lg w-fit"
         >
           {saving ? 'Saving...' : saved ? 'Saved!' : 'Save changes'}
+        </button>
+
+        <button
+          onClick={handleManageSubscription}
+          className="bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium px-6 py-2 rounded-lg w-fit"
+        >
+          Manage subscription
         </button>
       </div>
     </div>
