@@ -73,16 +73,16 @@ export default function HomePage() {
           if (cancelled) return
           if (CONVERSATION[i].role === 'bot') {
             setShowTyping(true)
-            await wait(1800)
+            await wait(3000)
             if (cancelled) return
             setShowTyping(false)
           } else {
-            await wait(1200)
+            await wait(2500)
             if (cancelled) return
           }
           setVisibleCount(i + 1)
         }
-        await wait(2500)
+        await wait(4000)
       }
     }
 
@@ -115,7 +115,7 @@ export default function HomePage() {
       <Navbar />
 
       {/* HERO */}
-      <section className="max-w-7xl mx-auto px-6 pt-24 pb-20 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <section className="max-w-7xl mx-auto px-6 pt-12 pb-12 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         <div>
           <h1 style={serif} className="text-5xl lg:text-6xl font-normal leading-tight mb-6">
             Every minute you don't reply, you're losing the lead.
