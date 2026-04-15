@@ -82,7 +82,7 @@ ptbot/
 - `demo.py` — POST /demo/<slug>/chat ✓. GET /demo/<slug> (serve frontend) is deferred to Phase 3.
 
 ## Current Build Phase
-**Phases 1 and 2 are complete.**
+**Phases 1 through 4 are complete.**
 
 Phase 1 — Foundation ✓
 - Flask app factory and blueprint structure
@@ -96,4 +96,18 @@ Phase 2 — Auth and Services ✓
 - All six blueprints implemented (auth.py stub pending Phase 5)
 - Gunicorn + Procfile, Railway deployment config
 
-**Next: Phase 3 — Frontend**
+Phase 3 — Frontend ✓
+- React + Vite + Tailwind + shadcn setup
+- Public pages: Home, Pricing
+- Dashboard pages: Overview, Conversations, Settings
+- Clerk React components for auth flow
+
+Phase 4 — Billing ✓
+- Billing service layer (services/billing.py) and three dashboard billing routes
+- Stripe Checkout, webhook handler, Customer Portal
+- Success and cancel pages with subscription polling
+- Subscription status middleware
+- Clerk webhook handler (blueprints/clerk.py) — creates PT record on user.created
+- Full new user flow: sign up → PT record created → checkout → payment → dashboard
+
+**Next: Phase 5 — Self-serve onboarding**

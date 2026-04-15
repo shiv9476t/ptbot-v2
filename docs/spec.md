@@ -273,20 +273,17 @@ Integration tests for the three critical paths that cannot break silently. Run a
 - Dashboard pages: Overview, Conversations, Settings
 - Clerk React components for auth flow
 
-### Phase 4 — Billing
-**Completed:**
+### Phase 4 — Billing ✓
 - Stripe Checkout for subscription signup
 - Stripe webhook handler updating subscription_status on events
-- Customer Portal route (create-portal-session endpoint built, UI not yet added)
+- Customer Portal route and link in Settings page
 - Success and cancel pages with polling logic
 - SPA routing fix (Caddy serving dist with try_files fallback)
 - Billing service layer (services/billing.py)
 - Three billing routes added to dashboard blueprint
-
-**Still to do:**
-- Subscription status middleware — redirect to /billing/checkout if subscription not active
-- Customer Portal link in dashboard Settings page
-- Clerk post-signup redirect to /billing/checkout (currently broken)
+- Subscription status middleware — redirects to /billing/checkout if subscription not active
+- Clerk webhook handler (blueprints/clerk.py) to create PT record on user.created event
+- Full new user flow working: sign up → PT record created → checkout → payment → dashboard
 
 ### Phase 5 — Self-serve onboarding (initially gated)
 - Instagram OAuth flow accessible from dashboard
