@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { SignIn, SignUp, useAuth } from '@clerk/clerk-react'
 import HomePage from './pages/public/HomePage'
-import PricingPage from './pages/public/PricingPage'
 import OverviewPage from './pages/dashboard/OverviewPage'
 import DashboardLayout from './components/shared/DashboardLayout'
 import ConversationsPage from './pages/dashboard/ConversationsPage'
@@ -22,7 +21,6 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/pricing" element={<PricingPage />} />
         <Route path="/sign-in/*" element={<SignIn routing="path" path="/sign-in" />} />
         <Route path="/sign-up/*" element={<SignUp routing="path" path="/sign-up" afterSignUpUrl="/billing/checkout" />} />
         <Route path="/dashboard/overview" element={

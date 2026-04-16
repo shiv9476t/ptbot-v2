@@ -72,6 +72,7 @@ export default function HomePage() {
         for (let i = 0; i < CONVERSATION.length; i++) {
           if (cancelled) return
           if (CONVERSATION[i].role === 'bot') {
+            await wait(800)
             setShowTyping(true)
             await wait(3000)
             if (cancelled) return
