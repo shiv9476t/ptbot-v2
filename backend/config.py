@@ -12,6 +12,7 @@ class Config:
     META_APP_ID = os.environ.get("META_APP_ID", "")
     META_INSTAGRAM_APP_SECRET = os.environ.get("META_INSTAGRAM_APP_SECRET", "")
     INSTAGRAM_VERIFY_TOKEN = os.environ.get("INSTAGRAM_VERIFY_TOKEN", "")
+    OAUTH_REDIRECT_URI = os.environ.get("OAUTH_REDIRECT_URI", "")
 
     # Admin
     ADMIN_SECRET = os.environ.get("ADMIN_SECRET", "")
