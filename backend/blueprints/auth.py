@@ -60,7 +60,7 @@ def instagram_oauth_start():
         "?force_reauth=true"
         f"&client_id={current_app.config['META_APP_ID']}"
         f"&redirect_uri={current_app.config['OAUTH_REDIRECT_URI']}"
-        "&scope=instagram_business_basic,instagram_manage_messages"
+        "&scope=instagram_business_basic,instagram_business_manage_messages"
         "&response_type=code"
         f"&state={state}"
     )
