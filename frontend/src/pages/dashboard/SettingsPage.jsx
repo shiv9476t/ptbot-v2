@@ -83,14 +83,14 @@ export default function SettingsPage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-medium px-6 py-2 rounded-lg w-fit"
+          className="bg-black hover:bg-gray-800 disabled:opacity-50 text-white text-sm font-medium px-6 py-2 rounded-lg w-fit"
         >
           {saving ? 'Saving...' : saved ? 'Saved!' : 'Save changes'}
         </button>
 
         <button
           onClick={handleManageSubscription}
-          className="bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium px-6 py-2 rounded-lg w-fit"
+          className="bg-black hover:bg-gray-800 text-white text-sm font-medium px-6 py-2 rounded-lg w-fit"
         >
           Manage subscription
         </button>
