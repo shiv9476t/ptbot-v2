@@ -22,6 +22,7 @@ def create_checkout_session(pt: PT, price_id: str, frontend_url: str) -> stripe.
         customer=pt.stripe_customer_id,
         mode="subscription",
         line_items=[{"price": price_id, "quantity": 1}],
+        subscription_data={"trial_period_days": 14},
         success_url=f"{frontend_url}/billing/success?session_id={{CHECKOUT_SESSION_ID}}",
         cancel_url=f"{frontend_url}/billing/cancel",
     )
