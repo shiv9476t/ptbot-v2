@@ -52,7 +52,7 @@ export default function SettingsPage() {
             type="text"
             value={settings.calendly_link || ''}
             onChange={e => setSettings({ ...settings, calendly_link: e.target.value })}
-            className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-sm text-white outline-none focus:border-blue-500"
+            className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm text-white outline-none focus:border-blue-500"
             placeholder="https://calendly.com/your-link"
           />
         </div>
@@ -62,7 +62,7 @@ export default function SettingsPage() {
           <select
             value={settings.price_mode}
             onChange={e => setSettings({ ...settings, price_mode: e.target.value })}
-            className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-sm text-white outline-none focus:border-blue-500"
+            className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm text-black outline-none focus:border-blue-500"
           >
             <option value="deflect">Deflect</option>
             <option value="reveal">Reveal</option>
@@ -75,7 +75,7 @@ export default function SettingsPage() {
             value={settings.tone_config || ''}
             onChange={e => setSettings({ ...settings, tone_config: e.target.value })}
             rows={6}
-            className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-sm text-white outline-none focus:border-blue-500"
+            className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm text-white outline-none focus:border-blue-500"
             placeholder="Describe the bot's tone and personality..."
           />
         </div>
