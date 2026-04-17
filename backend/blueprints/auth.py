@@ -112,11 +112,11 @@ def instagram_oauth_callback():
     long_lived_token = ll_resp.json()["access_token"]
 
     me_resp = requests.get(
-        "https://graph.instagram.com/me",
-        params={"fields": "id", "access_token": long_lived_token},
+        "https://graph.instagram.com/v21.0/me",
+        params={"fields": "user_id", "access_token": long_lived_token},
     )
     me_resp.raise_for_status()
-    instagram_account_id = me_resp.json()["id"]
+    instagram_account_id = me_resp.json()["user_id"]
 
     pt.instagram_token = long_lived_token
     pt.instagram_account_id = instagram_account_id
