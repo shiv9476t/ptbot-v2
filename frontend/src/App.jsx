@@ -6,6 +6,7 @@ import DashboardLayout from './components/shared/DashboardLayout'
 import ConversationsPage from './pages/dashboard/ConversationsPage'
 import SettingsPage from './pages/dashboard/SettingsPage'
 import OnboardingPage from './pages/dashboard/OnboardingPage'
+import DemoPage from './pages/dashboard/DemoPage'
 import CheckoutPage from './pages/billing/CheckoutPage'
 import SuccessPage from './pages/billing/SuccessPage'
 import CancelPage from './pages/billing/CancelPage'
@@ -35,6 +36,13 @@ export default function App() {
           <ProtectedRoute>
             <DashboardLayout>
               <OnboardingPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/dashboard/demo" element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <DemoPage />
             </DashboardLayout>
           </ProtectedRoute>
         } />
