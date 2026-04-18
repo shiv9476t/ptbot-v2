@@ -22,6 +22,7 @@ ptbot/
 │   ├── services/
 │   │   ├── agent.py            # AI agent logic — contact lifecycle, Claude API, photo tool
 │   │   ├── knowledge.py        # ChromaDB operations — embed_kb(), query_kb(), delete_kb()
+│   │   ├── kb_generation.py    # Self-serve KB generation — fetches Instagram posts, calls Claude, embeds
 │   │   ├── onboarding.py       # add_pt(), add_demo_pt(), embed_pt_kb()
 │   │   ├── prompt.py           # build_system_prompt() — full conversation strategy prompt
 │   │   └── channels/
@@ -35,7 +36,7 @@ ptbot/
 │   ├── src/
 │   │   ├── pages/
 │   │   │   ├── public/         # Home, Pricing, Demo
-│   │   │   └── dashboard/      # Overview, Conversations, Settings
+│   │   │   └── dashboard/      # Overview, Onboarding, Conversations, Settings
 │   │   ├── components/
 │   │   │   ├── ui/             # Generic components
 │   │   │   └── shared/         # PTBot-specific components
@@ -76,8 +77,8 @@ ptbot/
 ## Blueprint Status
 - `instagram.py` — GET /instagram (webhook verify) + POST /instagram (incoming DMs) ✓
 - `stripe.py` — POST /stripe (subscription events) ✓
-- `auth.py` — **currently empty stub**. The OAuth callback for connecting Instagram is Phase 5.
-- `dashboard.py` — all five dashboard routes with Clerk JWT auth ✓. OPTIONS requests bypass auth for CORS preflight.
+- `auth.py` — GET /auth/instagram (generate OAuth URL) + GET /auth/callback (exchange code, save token) ✓
+- `dashboard.py` — all dashboard routes with Clerk JWT auth ✓. Includes POST /api/dashboard/onboarding/generate. OPTIONS requests bypass auth for CORS preflight.
 - `admin.py` — all admin routes + GET /health ✓. Includes POST /admin/pts (create) and POST /admin/pts/<id> (update).
 - `demo.py` — POST /demo/<slug>/chat ✓. GET /demo/<slug> (serve frontend) is deferred to Phase 3.
 
@@ -110,4 +111,14 @@ Phase 4 — Billing ✓
 - Clerk webhook handler (blueprints/clerk.py) — creates PT record on user.created
 - Full new user flow: sign up → PT record created → checkout → payment → dashboard
 
-**Next: Phase 5 — Self-serve onboarding**
+**Phase 5 — Self-serve onboarding (in progress)**
+
+Completed:
+- Instagram OAuth flow — GET /auth/instagram + GET /auth/callback (blueprints/auth.py) ✓
+- KB generation from Instagram captions + optional website via Claude (services/kb_generation.py) ✓
+- POST /api/dashboard/onboarding/generate route ✓
+- 3-step onboarding page: Connect Instagram → Generate KB → Add Calendly link → Bot ready ✓
+
+Still to do:
+- Webhook subscription automation after OAuth
+- KB viewing/editing in dashboard

@@ -11,7 +11,7 @@ PTBot is a SaaS product that automates Instagram DM lead qualification for onlin
 
 ### Core principles
 - Foundation first — the spec locks in decisions that are hard to change later
-- Self-serve architecture, manual onboarding initially — features are built but gated
+- Self-serve architecture — PTs onboard themselves via the dashboard
 - Separation of concerns — routes are thin, logic lives in services, data access is isolated
 - Multi-tenancy by default — every database query scoped to a pt_id, always
 - One repo, two apps — frontend and backend in a monorepo, deployed independently
@@ -52,22 +52,21 @@ ptbot/
 │   ├── blueprints/
 │   │   ├── instagram.py        # Meta webhook
 │   │   ├── stripe.py           # Stripe webhook
-│   │   ├── auth.py             # OAuth callback (stub — Phase 5)
+│   │   ├── auth.py             # Instagram OAuth — GET /auth/instagram, GET /auth/callback
 │   │   ├── dashboard.py        # Logged-in PT API (Clerk JWT auth, OPTIONS bypass for CORS)
 │   │   ├── admin.py            # Internal tooling (Bearer token auth)
 │   │   └── demo.py             # Public demo chat endpoint
 │   ├── services/
 │   │   ├── agent.py            # AI agent logic — contact lifecycle, Claude API, photo tool
 │   │   ├── knowledge.py        # ChromaDB operations — embed_kb(), query_kb(), delete_kb()
+│   │   ├── kb_generation.py    # Self-serve KB generation — fetches Instagram posts, calls Claude, embeds
 │   │   ├── onboarding.py       # add_pt(), add_demo_pt(), embed_pt_kb()
 │   │   ├── prompt.py           # build_system_prompt() — full conversation strategy prompt
 │   │   └── channels/
 │   │       └── instagram.py    # Meta API calls — verify_signature, parse_message, send_reply, send_image
 │   ├── models/                 # SQLAlchemy models
 │   ├── database/               # Alembic migrations
-│   ├── scripts/                # Thin CLI wrappers for onboarding
-│   │   ├── add_pt.py
-│   │   └── generate_kb.py
+│   ├── scripts/                # Thin CLI wrappers
 │   ├── data/
 │   │   └── pt_docs/            # Raw knowledge base files per PT
 │   │       └── <pt_slug>/
@@ -78,7 +77,7 @@ ptbot/
 │   │   ├── App.jsx
 │   │   ├── pages/
 │   │   │   ├── public/         # Home, Pricing, Demo
-│   │   │   └── dashboard/      # Overview, Conversations, Settings
+│   │   │   └── dashboard/      # Overview, Onboarding, Conversations, Settings
 │   │   ├── components/
 │   │   │   ├── ui/             # Generic: buttons, modals, inputs
 │   │   │   └── shared/         # PTBot-specific: navbar, cards
@@ -151,11 +150,11 @@ Six blueprints. Each has a single caller and a distinct verification method.
 | POST | /stripe | All subscription events — update pt subscription_status |
 
 ### auth.py — OAuth
-**Currently an empty stub — the Instagram OAuth flow is Phase 5.**
 
 | Method | Endpoint | Purpose |
 |---|---|---|
-| GET | /auth/callback | Receives Meta OAuth code, exchanges for token, saves to PT record |
+| GET | /auth/instagram | Generates signed state param, returns Instagram OAuth URL |
+| GET | /auth/callback | Receives Meta OAuth code, exchanges for long-lived token, saves to PT record, redirects to dashboard |
 
 ### dashboard.py — Logged-in PT API
 All routes require a valid Clerk JWT. All queries scoped to the authenticated PT's id.
@@ -170,6 +169,7 @@ All routes require a valid Clerk JWT. All queries scoped to the authenticated PT
 | POST | /api/dashboard/billing/create-checkout-session | Create a Stripe Checkout Session; returns redirect URL |
 | POST | /api/dashboard/billing/create-portal-session | Create a Stripe Customer Portal Session; returns redirect URL |
 | GET | /api/dashboard/billing/status | Return subscription_status, plan, and trial_ends_at for the PT |
+| POST | /api/dashboard/onboarding/generate | Fetch Instagram posts + optional website, generate KB via Claude, embed into ChromaDB |
 
 ### admin.py — Internal tooling
 All routes require `Authorization: Bearer <ADMIN_SECRET>` header.
@@ -241,6 +241,7 @@ Integration tests for the three critical paths that cannot break silently. Run a
 | STRIPE_SECRET_KEY | Backend | Stripe API |
 | STRIPE_WEBHOOK_SECRET | Backend | Stripe webhook verification |
 | CLERK_SECRET_KEY | Backend | Clerk JWT verification |
+| OAUTH_REDIRECT_URI | Backend | Instagram OAuth redirect URI (must match Meta app config) |
 | RESEND_API_KEY | Backend | Transactional email |
 | SENTRY_DSN | Both | Error reporting |
 | STATIC_BASE_URL | Backend | Base URL for publicly accessible transformation photo URLs (e.g. https://api.ptbot.co) |
@@ -285,11 +286,13 @@ Integration tests for the three critical paths that cannot break silently. Run a
 - Clerk webhook handler (blueprints/clerk.py) to create PT record on user.created event
 - Full new user flow working: sign up → PT record created → checkout → payment → dashboard
 
-### Phase 5 — Self-serve onboarding (initially gated)
-- Instagram OAuth flow accessible from dashboard
-- Knowledge base upload and embedding via dashboard UI
-- Bot configuration via settings page
-- Feature flagged off until manual onboarding is proven
+### Phase 5 — Self-serve onboarding (in progress)
+- Instagram OAuth flow — GET /auth/instagram + GET /auth/callback ✓
+- Knowledge base generation from Instagram captions + optional website (services/kb_generation.py) ✓
+- 3-step onboarding page: Connect Instagram → Generate KB → Add Calendly link → Bot ready ✓
+- POST /api/dashboard/onboarding/generate route ✓
+- Webhook subscription automation after OAuth — TODO
+- KB viewing/editing in dashboard — TODO
 
 ### Phase 6 — Observability and email
 - PostHog events instrumented across frontend and backend
@@ -306,7 +309,7 @@ Integration tests for the three critical paths that cannot break silently. Run a
 | Clerk over custom auth | Auth done wrong is a security liability; Clerk handles complexity we don't need to own |
 | Stripe over custom billing | Same reasoning; billing errors cost money and trust |
 | Monorepo over polyrepo | Solo developer; overhead of syncing two repos adds no value at this stage |
-| Manual onboarding first | Validate the product before investing in self-serve infrastructure |
+| Manual onboarding first | Validated the product before investing in self-serve infrastructure — self-serve now implemented in Phase 5 |
 | PostgreSQL over SQLite | SQLite locks on concurrent writes and is wiped on Railway redeploy |
 | ChromaDB kept as vector store | Already working; no reason to replace what isn't broken |
 | Demo as mockup not video | Higher credibility, lower time cost — a key outreach insight |
