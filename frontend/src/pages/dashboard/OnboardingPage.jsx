@@ -61,7 +61,48 @@ export default function OnboardingPage() {
 
   if (!settings) return <p className="text-gray-500">Loading...</p>
 
-  if (settings.onboarding_complete && !settings.calendly_link) {
+  if (!settings.instagram_account_id) {
+    return (
+      <div className="max-w-lg">
+        <h1 className="text-2xl font-bold mb-2">Step 1: Connect your Instagram account</h1>
+        <p className="text-gray-500 mb-6">PTBot needs access to your Instagram DMs to qualify your leads automatically.</p>
+        <button
+          onClick={connectInstagram}
+          className="bg-black hover:bg-gray-800 text-white text-sm font-medium px-6 py-2 rounded-lg w-fit"
+        >
+          Connect Instagram
+        </button>
+      </div>
+    )
+  }
+
+  if (!settings.onboarding_complete) {
+    return (
+      <div className="max-w-lg">
+        <h1 className="text-2xl font-bold mb-2">Step 2: Set up your bot</h1>
+        <p className="text-gray-500 mb-6">We'll pull your recent Instagram posts and generate a knowledge base so your bot sounds like you.</p>
+        <div className="flex flex-col gap-3">
+          <input
+            type="text"
+            value={websiteUrl}
+            onChange={e => setWebsiteUrl(e.target.value)}
+            className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm outline-none focus:border-blue-500"
+            placeholder="https://yourwebsite.com (optional)"
+          />
+          <button
+            onClick={generateKb}
+            disabled={generating}
+            className="bg-black hover:bg-gray-800 disabled:opacity-50 text-white text-sm font-medium px-6 py-2 rounded-lg w-fit"
+          >
+            {generating ? 'Setting up your bot...' : 'Generate my knowledge base'}
+          </button>
+          {error && <p className="text-sm text-red-600">{error}</p>}
+        </div>
+      </div>
+    )
+  }
+
+  if (!settings.calendly_link) {
     return (
       <div className="max-w-lg">
         <h1 className="text-2xl font-bold mb-2">Step 3: Add your Calendly link</h1>
@@ -87,51 +128,10 @@ export default function OnboardingPage() {
     )
   }
 
-  if (settings.onboarding_complete) {
-    return (
-      <div className="max-w-lg">
-        <h1 className="text-2xl font-bold mb-2">Your bot is ready 🎉</h1>
-        <p className="text-gray-500 mb-6">PTBot is live on your Instagram. Leads who DM you will be qualified automatically.</p>
-        <div className="flex flex-col gap-3">
-          <input
-            type="text"
-            value={websiteUrl}
-            onChange={e => setWebsiteUrl(e.target.value)}
-            className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm outline-none focus:border-blue-500"
-            placeholder="https://yourwebsite.com (optional)"
-          />
-          <button
-            onClick={generateKb}
-            disabled={generating}
-            className="bg-black hover:bg-gray-800 disabled:opacity-50 text-white text-sm font-medium px-6 py-2 rounded-lg w-fit"
-          >
-            {generating ? 'Setting up your bot...' : 'Regenerate knowledge base'}
-          </button>
-          {error && <p className="text-sm text-red-600">{error}</p>}
-        </div>
-      </div>
-    )
-  }
-
-  if (!settings.instagram_account_id) {
-    return (
-      <div className="max-w-lg">
-        <h1 className="text-2xl font-bold mb-2">Step 1: Connect your Instagram account</h1>
-        <p className="text-gray-500 mb-6">PTBot needs access to your Instagram DMs to qualify your leads automatically.</p>
-        <button
-          onClick={connectInstagram}
-          className="bg-black hover:bg-gray-800 text-white text-sm font-medium px-6 py-2 rounded-lg w-fit"
-        >
-          Connect Instagram
-        </button>
-      </div>
-    )
-  }
-
   return (
     <div className="max-w-lg">
-      <h1 className="text-2xl font-bold mb-2">Step 2: Set up your bot</h1>
-      <p className="text-gray-500 mb-6">We'll pull your recent Instagram posts and generate a knowledge base so your bot sounds like you.</p>
+      <h1 className="text-2xl font-bold mb-2">Your bot is ready 🎉</h1>
+      <p className="text-gray-500 mb-6">PTBot is live on your Instagram. Leads who DM you will be qualified automatically.</p>
       <div className="flex flex-col gap-3">
         <input
           type="text"
@@ -145,7 +145,7 @@ export default function OnboardingPage() {
           disabled={generating}
           className="bg-black hover:bg-gray-800 disabled:opacity-50 text-white text-sm font-medium px-6 py-2 rounded-lg w-fit"
         >
-          {generating ? 'Setting up your bot...' : 'Generate my knowledge base'}
+          {generating ? 'Setting up your bot...' : 'Regenerate knowledge base'}
         </button>
         {error && <p className="text-sm text-red-600">{error}</p>}
       </div>
