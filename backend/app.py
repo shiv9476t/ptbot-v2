@@ -11,7 +11,9 @@ def create_app():
     init_extensions(app)
     CORS(app, origins=[
         "http://localhost:5173",
-        "https://successful-enjoyment-staging.up.railway.app"
+        "https://successful-enjoyment-staging.up.railway.app",
+        "https://ptbot.up.railway.app",
+        app.config.get("FRONTEND_URL", ""),
     ])
     _register_blueprints(app)
     return app
