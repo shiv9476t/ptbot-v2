@@ -7,9 +7,6 @@ export default function SettingsPage() {
   const [settings, setSettings] = useState(null)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
-  const [instagramConnected] = useState(() =>
-    new URLSearchParams(window.location.search).get('instagram') === 'connected'
-  )
 
   useEffect(() => {
     async function fetchSettings() {
@@ -34,12 +31,6 @@ export default function SettingsPage() {
     setSaving(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
-  }
-
-  async function connectInstagram() {
-    const token = await getToken()
-    const data = await apiFetch('/auth/instagram', token)
-    window.location.href = data.url
   }
 
   async function handleManageSubscription() {
@@ -102,16 +93,6 @@ export default function SettingsPage() {
           className="bg-black hover:bg-gray-800 text-white text-sm font-medium px-6 py-2 rounded-lg w-fit"
         >
           Manage subscription
-        </button>
-
-        {instagramConnected && (
-          <p className="text-sm text-green-600">Instagram connected successfully</p>
-        )}
-        <button
-          onClick={connectInstagram}
-          className="bg-black hover:bg-gray-800 text-white text-sm font-medium px-6 py-2 rounded-lg w-fit"
-        >
-          Connect Instagram
         </button>
       </div>
     </div>

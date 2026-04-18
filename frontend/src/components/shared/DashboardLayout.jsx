@@ -14,6 +14,9 @@ export default function DashboardLayout({ children }) {
           <Link to="/dashboard/overview" className="px-3 py-2 rounded-md hover:bg-gray-100 text-sm">
             Overview
           </Link>
+          <Link to="/dashboard/onboarding" className="px-3 py-2 rounded-md hover:bg-gray-100 text-sm">
+            Onboarding
+          </Link>
           <Link to="/dashboard/conversations" className="px-3 py-2 rounded-md hover:bg-gray-100 text-sm">
             Conversations
           </Link>

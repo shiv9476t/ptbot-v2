@@ -138,6 +138,18 @@ def billing_status():
     return jsonify(get_subscription_status(g.pt)), 200
 
 
+@dashboard_bp.post("/onboarding/generate")
+def onboarding_generate():
+    from services.kb_generation import generate_kb
+    pt = g.pt
+    body = request.get_json(silent=True) or {}
+    website_url = body.get("website_url") or None
+    generate_kb(pt, website_url)
+    pt.onboarding_complete = True
+    db.session.commit()
+    return jsonify({"status": "ok"}), 200
+
+
 # ---------------------------------------------------------------------------
 # Serialisers
 # ---------------------------------------------------------------------------

@@ -5,6 +5,7 @@ import OverviewPage from './pages/dashboard/OverviewPage'
 import DashboardLayout from './components/shared/DashboardLayout'
 import ConversationsPage from './pages/dashboard/ConversationsPage'
 import SettingsPage from './pages/dashboard/SettingsPage'
+import OnboardingPage from './pages/dashboard/OnboardingPage'
 import CheckoutPage from './pages/billing/CheckoutPage'
 import SuccessPage from './pages/billing/SuccessPage'
 import CancelPage from './pages/billing/CancelPage'
@@ -27,6 +28,13 @@ export default function App() {
           <ProtectedRoute>
             <DashboardLayout>
               <OverviewPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/dashboard/onboarding" element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <OnboardingPage />
             </DashboardLayout>
           </ProtectedRoute>
         } />
