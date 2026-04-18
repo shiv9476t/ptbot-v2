@@ -123,4 +123,4 @@ def instagram_oauth_callback():
     db.session.commit()
 
     logger.info("instagram_oauth_callback: connected instagram for pt_id=%s", pt.id)
-    return redirect(f"{current_app.config['FRONTEND_URL']}/dashboard/settings?instagram=connected")
+    return redirect(f"{current_app.config['FRONTEND_URL']}/dashboard/onboarding")
