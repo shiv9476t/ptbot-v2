@@ -10,6 +10,8 @@ export default function OnboardingPage() {
   const [error, setError] = useState(null)
   const [calendlyLink, setCalendlyLink] = useState('')
   const [saving, setSaving] = useState(false)
+  const [step0Done, setStep0Done] = useState(false)
+  const [instagramHandle, setInstagramHandle] = useState('')
 
   async function fetchSettings() {
     const token = await getToken()
@@ -60,6 +62,41 @@ export default function OnboardingPage() {
   }
 
   if (!settings) return <p className="text-gray-500">Loading...</p>
+
+  if (!step0Done && !settings.instagram_account_id) {
+    return (
+      <div className="max-w-lg">
+        <h1 className="text-2xl font-bold mb-2">Step 0: Request Instagram access</h1>
+        <p className="text-gray-500 mb-6">Before connecting your Instagram, we need to set up your access. Enter your Instagram handle below and we'll get it ready within a few hours — you'll receive a notification on Instagram to accept.</p>
+        <div className="flex flex-col gap-3">
+          <input
+            type="text"
+            value={instagramHandle}
+            onChange={e => setInstagramHandle(e.target.value)}
+            className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm outline-none focus:border-blue-500"
+            placeholder="@yourhandle"
+          />
+          <button
+            onClick={() => {
+              if (instagramHandle.trim()) {
+                window.location.href = `mailto:shiv9476t@gmail.com?subject=PTBot%20Instagram%20Tester%20Request&body=Instagram%20handle%3A%20${encodeURIComponent(instagramHandle)}`
+              }
+              setStep0Done(true)
+            }}
+            className="bg-black hover:bg-gray-800 text-white text-sm font-medium px-6 py-2 rounded-lg w-fit"
+          >
+            Request access
+          </button>
+          <button
+            onClick={() => setStep0Done(true)}
+            className="text-sm text-gray-400 hover:text-black w-fit"
+          >
+            Already requested access? Skip this step
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   if (!settings.instagram_account_id) {
     return (
