@@ -218,13 +218,20 @@ Integration tests for the three critical paths that cannot break silently. Run a
 
 ## 8. Environments
 
-| Environment | Branch | Purpose |
-|---|---|---|
-| local | any | Development on your machine |
-| staging | staging | Real PostgreSQL. Tests run here before production |
-| production | main | Real users. Nothing goes here without passing staging first |
+| Environment | Branch | Frontend URL | Backend URL |
+|---|---|---|---|
+| local | any | http://localhost:5173 | http://localhost:5000 |
+| staging | staging | successful-enjoyment-staging.up.railway.app | ptbot-v2-staging.up.railway.app |
+| production | main | ptbot.up.railway.app | ptbot-api.up.railway.app |
+
+**Git workflow: feature branches → staging → main. Production auto-deploys from main.**
 
 **Rule: every change goes local → staging → production. No exceptions.**
+
+### Production status
+- Live at ptbot.up.railway.app since April 2026
+- Live Stripe payments enabled
+- Full self-serve onboarding working end to end
 
 ---
 

@@ -64,7 +64,7 @@ ptbot/
 3. **No hardcoded secrets**: All API keys and config come from environment variables via `config.py`. Never hardcode credentials.
 4. **Always use blueprints**: Routes are organised by domain in `blueprints/`. Never add routes directly to `app.py`.
 5. **Services are independent of HTTP**: Service functions know nothing about Flask requests or responses. They take plain Python arguments and return plain Python values.
-6. **Staging first**: Always work on the `staging` branch. Never commit directly to `main`.
+6. **Staging first**: Work on feature branches, merge to `staging` to test, then merge to `main` for production. Never commit directly to `main`.
 
 ## How to Work With Me
 - Do **one task at a time**. Complete it fully before moving to the next.
@@ -82,8 +82,17 @@ ptbot/
 - `admin.py` — all admin routes + GET /health ✓. Includes POST /admin/pts (create) and POST /admin/pts/<id> (update).
 - `demo.py` — POST /demo/<slug>/chat ✓. GET /demo/<slug> (serve frontend) is deferred to Phase 3.
 
+## Environments
+| Environment | Frontend | Backend |
+|---|---|---|
+| local | http://localhost:5173 | http://localhost:5000 |
+| staging | successful-enjoyment-staging.up.railway.app | ptbot-v2-staging.up.railway.app |
+| production | ptbot.up.railway.app | ptbot-api.up.railway.app |
+
+Production is live (April 2026) with live Stripe payments and full self-serve onboarding working end to end.
+
 ## Current Build Phase
-**Phases 1 through 4 are complete.**
+**Phases 1 through 4 are complete. Phase 5 is in progress.**
 
 Phase 1 — Foundation ✓
 - Flask app factory and blueprint structure
