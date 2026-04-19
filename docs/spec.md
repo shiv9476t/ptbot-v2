@@ -298,7 +298,7 @@ Integration tests for the three critical paths that cannot break silently. Run a
 - Knowledge base generation from Instagram captions + optional website (services/kb_generation.py) ✓
 - 3-step onboarding page: Connect Instagram → Generate KB → Add Calendly link → Bot ready ✓
 - POST /api/dashboard/onboarding/generate route ✓
-- Webhook subscription automation after OAuth — TODO
+- Webhook subscription automation after OAuth ✓ (handled automatically when PT connects as an Instagram Tester)
 - KB viewing/editing in dashboard — TODO
 
 ### Phase 6 — Observability and email

@@ -129,5 +129,5 @@ Completed:
 - 3-step onboarding page: Connect Instagram → Generate KB → Add Calendly link → Bot ready ✓
 
 Still to do:
-- Webhook subscription automation after OAuth
+- Webhook subscription automation after OAuth ✓ (handled automatically when PT connects as an Instagram Tester)
 - KB viewing/editing in dashboard

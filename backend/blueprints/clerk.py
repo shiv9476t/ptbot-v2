@@ -44,6 +44,10 @@ def _handle_user_created(data: dict) -> None:
     last = data.get("last_name") or ""
     name = f"{first} {last}".strip()
 
+    if PT.query.filter_by(clerk_user_id=clerk_user_id).first():
+        logger.info("_handle_user_created: pt already exists for clerk_user_id=%s, skipping", clerk_user_id)
+        return
+
     pt = PT(
         clerk_user_id=clerk_user_id,
         email=email,
