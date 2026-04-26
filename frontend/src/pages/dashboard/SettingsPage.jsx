@@ -38,6 +38,19 @@ export default function SettingsPage() {
     const data = await createPortalSession(token)
     window.location.href = data.url
   }
+    
+  async function handleBotToggle(enabled) {
+      try {
+          const token = await getToken()
+          await apiFetch('/api/dashboard/settings', token, {
+              method: 'PUT',
+              body: JSON.stringify({ bot_enabled: enabled })
+          })
+          setSettings({ ...settings, bot_enabled: enabled})      
+      } catch (e) {
+          console.error(`Failed to update bot status:`, e)
+      }
+  }
 
   if (!settings) return <p className="text-gray-400">Loading...</p>
 
@@ -46,6 +59,17 @@ export default function SettingsPage() {
       <h1 className="text-2xl font-bold mb-6">Settings</h1>
 
       <div className="flex flex-col gap-6">
+          
+        <div className="flex items-center gap-2">
+            <input 
+                type="checkbox" 
+                checked={settings.bot_enabled} 
+                onChange={e => handleBotToggle(e.target.checked)} 
+            />
+            <label className="text-sm text-gray-400">Bot Enabled</label>
+        </div>
+          
+          
         <div>
           <label className="block text-sm text-gray-400 mb-2">Calendly Link</label>
           <input
