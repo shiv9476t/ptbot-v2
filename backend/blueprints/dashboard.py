@@ -104,7 +104,7 @@ def update_settings():
     body = request.get_json(silent=True) or {}
     pt = g.pt
 
-    updatable = {"tone_config", "calendly_link", "price_mode"}
+    updatable = {"tone_config", "calendly_link", "price_mode", "bot_enabled"}
     for field in updatable:
         if field in body:
             setattr(pt, field, body[field])
@@ -186,4 +186,5 @@ def _settings_to_dict(pt: PT) -> dict:
         "subscription_status": pt.subscription_status,
         "plan": pt.plan,
         "trial_ends_at": pt.trial_ends_at.isoformat() if pt.trial_ends_at else None,
+        "bot_enabled" : pt.bot_enabled,
     }

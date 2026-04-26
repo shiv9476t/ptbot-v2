@@ -58,6 +58,9 @@ def webhook_receive():
     if pt is None:
         logger.error("webhook_receive: no PT found for instagram_account_id=%s", recipient_id)
         return jsonify({"error": "PT not found"}), 404
+    
+    if not pt.bot_enabled:
+        return jsonify({"status" : "bot disabled"}), 200
 
     reply_text, photo_url = run_agent(pt, sender_id, message_text)
 
