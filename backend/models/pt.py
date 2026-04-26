@@ -22,5 +22,6 @@ class PT(db.Model):
     trial_ends_at = db.Column(db.DateTime)
     price_mode = db.Column(db.String, nullable=False, default="deflect")
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    bot_enabled = db.Column(db.Boolean, nullable=False, default=True)
 
     contacts = db.relationship("Contact", back_populates="pt", lazy="dynamic")
