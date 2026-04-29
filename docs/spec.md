@@ -112,6 +112,7 @@ PostgreSQL. Every table holding PT-specific data has a `pt_id` foreign key. Ever
 | subscription_status | string | trialing / active / past_due / cancelled |
 | plan | string | basic / pro |
 | trial_ends_at | datetime | |
+| bot_enabled | boolean | Whether the bot is active — defaults to True. Checked in webhook_receive before running agent. |
 
 ### contacts
 | Field | Type | Notes |
@@ -142,7 +143,7 @@ Six blueprints. Each has a single caller and a distinct verification method.
 | Method | Endpoint | Purpose |
 |---|---|---|
 | GET | /instagram | One-time webhook verification challenge from Meta |
-| POST | /instagram | Incoming DM events — verify signature, run agent, send reply |
+| POST | /instagram | Incoming DM events — verify signature, check bot_enabled, run agent, send reply |
 
 ### stripe.py — Stripe webhook
 | Method | Endpoint | Purpose |
@@ -164,8 +165,8 @@ All routes require a valid Clerk JWT. All queries scoped to the authenticated PT
 | GET | /api/dashboard/overview | Stats: leads, conversion rate, booked calls |
 | GET | /api/dashboard/contacts | List of leads with status |
 | GET | /api/dashboard/contacts/:id/messages | Message history for a lead |
-| GET | /api/dashboard/settings | Fetch current PT settings |
-| PUT | /api/dashboard/settings | Update settings (Calendly, tone, pricing) |
+| GET | /api/dashboard/settings | Fetch current PT settings including bot_enabled |
+| PUT | /api/dashboard/settings | Update settings (Calendly, tone, pricing, bot_enabled) |
 | POST | /api/dashboard/billing/create-checkout-session | Create a Stripe Checkout Session; returns redirect URL |
 | POST | /api/dashboard/billing/create-portal-session | Create a Stripe Customer Portal Session; returns redirect URL |
 | GET | /api/dashboard/billing/status | Return subscription_status, plan, and trial_ends_at for the PT |
@@ -190,7 +191,7 @@ No auth required. Each PT has a unique slug.
 
 | Method | Endpoint | Purpose |
 |---|---|---|
-| GET | /demo/:slug | Serve the demo chat UI — **deferred to Phase 3 (frontend)** |
+| GET | /demo/:slug | Serve the demo chat UI — deferred to Phase 3 (frontend) |
 | POST | /demo/:slug/chat | Handle messages from the demo page ✓ |
 
 ---
@@ -210,7 +211,7 @@ No auth required. Each PT has a unique slug.
 
 Integration tests for the three critical paths that cannot break silently. Run automatically in CI before every deployment to staging.
 
-- **Instagram webhook** — verify signature check, message parsing, agent trigger, reply sent
+- **Instagram webhook** — verify signature check, message parsing, bot_enabled check, agent trigger, reply sent
 - **Agent** — given a conversation history and PT config, returns a valid reply
 - **Stripe webhook** — subscription events correctly update pt subscription_status
 
@@ -228,10 +229,15 @@ Integration tests for the three critical paths that cannot break silently. Run a
 
 **Rule: every change goes local → staging → production. No exceptions.**
 
+### Railway configuration
+- Pre-deploy command on both staging and production backend: `alembic upgrade head`
+- Migrations run automatically before Gunicorn starts on every deploy
+
 ### Production status
 - Live at ptbot.up.railway.app since April 2026
 - Live Stripe payments enabled
 - Full self-serve onboarding working end to end
+- Bot enabled/disabled toggle live in settings
 
 ---
 
@@ -251,10 +257,11 @@ Integration tests for the three critical paths that cannot break silently. Run a
 | OAUTH_REDIRECT_URI | Backend | Instagram OAuth redirect URI (must match Meta app config) |
 | RESEND_API_KEY | Backend | Transactional email |
 | SENTRY_DSN | Both | Error reporting |
-| STATIC_BASE_URL | Backend | Base URL for publicly accessible transformation photo URLs (e.g. https://api.ptbot.co) |
+| STATIC_BASE_URL | Backend | Base URL for publicly accessible transformation photo URLs |
 | VITE_CLERK_PUBLISHABLE_KEY | Frontend | Clerk React components |
 | VITE_API_URL | Frontend | Backend API base URL |
 | VITE_POSTHOG_KEY | Frontend | PostHog analytics |
+| TYPING_DELAY | Backend | Set to "true" in production to enable human-like reply delays. Currently disabled. |
 
 ---
 
@@ -275,10 +282,10 @@ Integration tests for the three critical paths that cannot break silently. Run a
 - Demo chat endpoint (POST /demo/<slug>/chat)
 - Admin endpoints: list PTs/contacts, update PT, test agent, add demo PT, embed KB
 
-### Phase 3 — Frontend
+### Phase 3 — Frontend ✓
 - React + Vite + Tailwind + shadcn setup
 - Public pages: Home, Pricing, Demo
-- Dashboard pages: Overview, Conversations, Settings
+- Dashboard pages: Overview, Conversations, Settings, Onboarding
 - Clerk React components for auth flow
 
 ### Phase 4 — Billing ✓
@@ -293,18 +300,24 @@ Integration tests for the three critical paths that cannot break silently. Run a
 - Clerk webhook handler (blueprints/clerk.py) to create PT record on user.created event
 - Full new user flow working: sign up → PT record created → checkout → payment → dashboard
 
-### Phase 5 — Self-serve onboarding (in progress)
+### Phase 5 — Self-serve onboarding ✓
 - Instagram OAuth flow — GET /auth/instagram + GET /auth/callback ✓
-- Knowledge base generation from Instagram captions + optional website (services/kb_generation.py) ✓
+- Knowledge base generation from Instagram captions + optional website ✓
 - 3-step onboarding page: Connect Instagram → Generate KB → Add Calendly link → Bot ready ✓
 - POST /api/dashboard/onboarding/generate route ✓
-- Webhook subscription automation after OAuth ✓ (handled automatically when PT connects as an Instagram Tester)
-- KB viewing/editing in dashboard — TODO
+- Webhook subscription automation after OAuth ✓
+- Bot enabled/disabled toggle in settings ✓
+  - bot_enabled column added to pts table via Alembic migration
+  - Checked in webhook_receive before running agent
+  - Exposed in GET /settings and updatable via PUT /settings
+  - Toggle UI in settings page with immediate save on change
+- Railway pre-deploy command configured: `alembic upgrade head` ✓
 
-### Phase 6 — Observability and email
+### Phase 6 — Observability, email, and testing (next)
+- Integration tests for three critical paths (Instagram webhook, agent, Stripe webhook)
 - PostHog events instrumented across frontend and backend
 - Resend transactional email: welcome, weekly lead summary, billing receipts
-- Integration tests written for three critical paths
+- KB viewing/editing in dashboard
 
 ---
 
@@ -320,3 +333,5 @@ Integration tests for the three critical paths that cannot break silently. Run a
 | PostgreSQL over SQLite | SQLite locks on concurrent writes and is wiped on Railway redeploy |
 | ChromaDB kept as vector store | Already working; no reason to replace what isn't broken |
 | Demo as mockup not video | Higher credibility, lower time cost — a key outreach insight |
+| alembic upgrade head as pre-deploy command | Ensures migrations always run before new code goes live — prevents schema/code mismatch on deploy |
+| bot_enabled defaults to True | Existing and new PTs have bot active by default — opt-out rather than opt-in |

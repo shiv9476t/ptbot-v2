@@ -13,10 +13,10 @@ ptbot/
 │   ├── run.py                  # Local dev entry point — loads .env then calls create_app()
 │   ├── Procfile                # Gunicorn start command for Railway
 │   ├── blueprints/
-│   │   ├── instagram.py        # Meta webhook
+│   │   ├── instagram.py        # Meta webhook — checks bot_enabled before running agent
 │   │   ├── stripe.py           # Stripe webhook
 │   │   ├── auth.py             # OAuth callback
-│   │   ├── dashboard.py        # Logged-in PT API
+│   │   ├── dashboard.py        # Logged-in PT API — includes bot_enabled in settings
 │   │   ├── admin.py            # Internal tooling
 │   │   └── demo.py             # Public demo pages
 │   ├── services/
@@ -27,7 +27,7 @@ ptbot/
 │   │   ├── prompt.py           # build_system_prompt() — full conversation strategy prompt
 │   │   └── channels/
 │   │       └── instagram.py    # Meta API calls — verify_signature, parse_message, send_reply, send_image
-│   ├── models/                 # SQLAlchemy models
+│   ├── models/                 # SQLAlchemy models — PT has bot_enabled column (default True)
 │   ├── database/               # Alembic migrations
 │   ├── scripts/                # Thin CLI wrappers
 │   ├── data/pt_docs/           # Raw knowledge base files per PT
@@ -65,6 +65,7 @@ ptbot/
 4. **Always use blueprints**: Routes are organised by domain in `blueprints/`. Never add routes directly to `app.py`.
 5. **Services are independent of HTTP**: Service functions know nothing about Flask requests or responses. They take plain Python arguments and return plain Python values.
 6. **Staging first**: Work on feature branches, merge to `staging` to test, then merge to `main` for production. Never commit directly to `main`.
+7. **Never modify the database schema directly**: Always create an Alembic migration. Railway pre-deploy command runs `alembic upgrade head` automatically on every deploy.
 
 ## How to Work With Me
 - Do **one task at a time**. Complete it fully before moving to the next.
@@ -75,10 +76,10 @@ ptbot/
 - Never modify the database schema directly — always create an Alembic migration.
 
 ## Blueprint Status
-- `instagram.py` — GET /instagram (webhook verify) + POST /instagram (incoming DMs) ✓
+- `instagram.py` — GET /instagram (webhook verify) + POST /instagram (incoming DMs) ✓. Checks `pt.bot_enabled` before running agent — returns 200 silently if disabled.
 - `stripe.py` — POST /stripe (subscription events) ✓
 - `auth.py` — GET /auth/instagram (generate OAuth URL) + GET /auth/callback (exchange code, save token) ✓
-- `dashboard.py` — all dashboard routes with Clerk JWT auth ✓. Includes POST /api/dashboard/onboarding/generate. OPTIONS requests bypass auth for CORS preflight.
+- `dashboard.py` — all dashboard routes with Clerk JWT auth ✓. Includes POST /api/dashboard/onboarding/generate. OPTIONS requests bypass auth for CORS preflight. `bot_enabled` exposed in GET /settings and updatable via PUT /settings.
 - `admin.py` — all admin routes + GET /health ✓. Includes POST /admin/pts (create) and POST /admin/pts/<id> (update).
 - `demo.py` — POST /demo/<slug>/chat ✓. GET /demo/<slug> (serve frontend) is deferred to Phase 3.
 
@@ -91,43 +92,26 @@ ptbot/
 
 Production is live (April 2026) with live Stripe payments and full self-serve onboarding working end to end.
 
+## Railway Configuration
+- **Pre-deploy command** (both staging and production backend): `alembic upgrade head`
+- Migrations run automatically before Gunicorn starts on every deploy
+
 ## Current Build Phase
-**Phases 1 through 4 are complete. Phase 5 is in progress.**
+**Phases 1 through 5 are complete. Phase 6 is next.**
 
 Phase 1 — Foundation ✓
-- Flask app factory and blueprint structure
-- SQLAlchemy models and first Alembic migration
-- Config and extensions setup
-- Sentry and structured logging
-
 Phase 2 — Auth and Services ✓
-- Clerk JWT verification on dashboard blueprint
-- Full services layer: agent, knowledge, prompt, onboarding, channels/instagram
-- All six blueprints implemented (auth.py stub pending Phase 5)
-- Gunicorn + Procfile, Railway deployment config
-
 Phase 3 — Frontend ✓
-- React + Vite + Tailwind + shadcn setup
-- Public pages: Home, Pricing
-- Dashboard pages: Overview, Conversations, Settings
-- Clerk React components for auth flow
-
 Phase 4 — Billing ✓
-- Billing service layer (services/billing.py) and three dashboard billing routes
-- Stripe Checkout, webhook handler, Customer Portal
-- Success and cancel pages with subscription polling
-- Subscription status middleware
-- Clerk webhook handler (blueprints/clerk.py) — creates PT record on user.created
-- Full new user flow: sign up → PT record created → checkout → payment → dashboard
+Phase 5 — Self-serve onboarding ✓
+- Instagram OAuth flow ✓
+- KB generation from Instagram captions + optional website ✓
+- 3-step onboarding page ✓
+- POST /api/dashboard/onboarding/generate ✓
+- Bot enabled/disabled toggle in settings ✓ (bot_enabled column on pts, checked in webhook_receive)
 
-**Phase 5 — Self-serve onboarding (in progress)**
-
-Completed:
-- Instagram OAuth flow — GET /auth/instagram + GET /auth/callback (blueprints/auth.py) ✓
-- KB generation from Instagram captions + optional website via Claude (services/kb_generation.py) ✓
-- POST /api/dashboard/onboarding/generate route ✓
-- 3-step onboarding page: Connect Instagram → Generate KB → Add Calendly link → Bot ready ✓
-
-Still to do:
-- Webhook subscription automation after OAuth ✓ (handled automatically when PT connects as an Instagram Tester)
+**Phase 6 — Observability, email, and testing (next)**
+- Integration tests for three critical paths (Instagram webhook, agent, Stripe webhook)
+- PostHog events instrumented across frontend and backend
+- Resend transactional email: welcome, weekly lead summary, billing receipts
 - KB viewing/editing in dashboard

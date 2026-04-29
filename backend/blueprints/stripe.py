@@ -33,7 +33,7 @@ def webhook():
 
     try:
         event = stripe.Webhook.construct_event(raw_body, sig_header, secret)
-    except stripe.errors.SignatureVerificationError:
+    except stripe.SignatureVerificationError:
         logger.warning("stripe webhook: invalid signature")
         return jsonify({"error": "Invalid signature"}), 403
     except Exception:
