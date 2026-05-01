@@ -116,8 +116,8 @@ export default function HomePage() {
       <Navbar />
 
       {/* HERO */}
-      <section className="max-w-5xl mx-auto px-6 pt-12 pb-12 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-8 items-center">
-        <div className="flex flex-col justify-start min-h-[100svh] lg:min-h-0">
+      <section className="max-w-5xl mx-auto px-6 pt-12 pb-12 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-8 items-center">
+        <div className="flex flex-col justify-start min-h-[85svh] lg:min-h-0">
           <h1 style={serif} className="text-5xl lg:text-6xl font-normal leading-tight mb-6">
             Every minute you don't reply, you're losing the lead.
           </h1>
