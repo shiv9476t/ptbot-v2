@@ -72,7 +72,7 @@ export default function HomePage() {
         for (let i = 0; i < CONVERSATION.length; i++) {
           if (cancelled) return
           if (CONVERSATION[i].role === 'bot') {
-            await wait(800)
+            await wait(1500)
             setShowTyping(true)
             await wait(3000)
             if (cancelled) return
@@ -116,7 +116,7 @@ export default function HomePage() {
       <Navbar />
 
       {/* HERO */}
-      <section className="max-w-5xl mx-auto px-6 pt-12 pb-12 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+      <section className="max-w-5xl mx-auto px-6 pt-12 pb-12 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-8 items-center">
         <div>
           <h1 style={serif} className="text-5xl lg:text-6xl font-normal leading-tight mb-6">
             Every minute you don't reply, you're losing the lead.
