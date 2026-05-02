@@ -1,8 +1,30 @@
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@clerk/clerk-react'
+import { apiFetch } from '../../lib/api'
 
 export default function DashboardLayout({ children }) {
-  const { signOut } = useAuth()
+  const { signOut, getToken } = useAuth()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    async function checkOnboarding() {
+      try {
+        const token = await getToken()
+        const data = await apiFetch('/api/dashboard/settings', token)
+        if (!data.onboarding_complete && location.pathname !== '/dashboard/onboarding') {
+          navigate('/dashboard/onboarding', { replace: true })
+        }
+      } finally {
+        setReady(true)
+      }
+    }
+    checkOnboarding()
+  }, [location.pathname])
+
+  if (!ready) return null
 
   return (
     <div className="flex h-screen bg-white text-black">
