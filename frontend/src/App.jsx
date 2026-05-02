@@ -23,8 +23,16 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/sign-in/*" element={<SignIn routing="path" path="/sign-in" />} />
-        <Route path="/sign-up/*" element={<SignUp routing="path" path="/sign-up" afterSignUpUrl="/billing/checkout" />} />
+        <Route path="/sign-in/*" element={
+          <div className="min-h-screen flex items-center justify-center">
+            <SignIn routing="path" path="/sign-in" />
+          </div>
+        } />
+        <Route path="/sign-up/*" element={
+          <div className="min-h-screen flex items-center justify-center">
+            <SignUp routing="path" path="/sign-up" afterSignUpUrl="/billing/checkout" />
+          </div>
+        } />
         <Route path="/dashboard/overview" element={
           <ProtectedRoute>
             <DashboardLayout>
